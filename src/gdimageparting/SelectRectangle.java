@@ -1,10 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gdimageparting;
-
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -49,9 +43,9 @@ class SelectRectangle extends JLabel {
         @Override
         public void mousePressed(MouseEvent event) {
             int x = event.getX();
-            drukX = x;
+            drukX = getGeschaaled(  x);
             int y = event.getY();
-            drukY = y;
+            drukY = getGeschaaled(y);
             System.out.println("SelectRectangle.MListener.mousePressed()" + x + " " + y);
             curRect = new Rectangle(x, y, 0, 0);
             updateDrawableRect(getWidth(), getHeight());
@@ -66,8 +60,13 @@ class SelectRectangle extends JLabel {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            int losX = e.getX();
-            int losY = e.getY();
+            int losX = Math.max(0, e.getX());
+            int losY = Math.max(0, e.getY());
+            // schalen van deze coordinaten
+            losX = getGeschaaled(losX);
+            losY = getGeschaaled(losY);
+            
+            
 
             updateSize(e);
 //            System.out.println("SelectRectangle.MListener.mouseReleased()" + e.getX() + " " + e.getY());
@@ -80,9 +79,7 @@ class SelectRectangle extends JLabel {
                     null, //do not use a custom Icon
                     options, //the titles of buttons
                     options[1]); //default button title
-//            System.out.println("SelectRectangle.MListener.mouseReleased() " + n);
             if (n == 0) {
-
                 try {
                     // make  deel image
                     File inputFile = new File(GdImageParting.starFile);
@@ -99,18 +96,16 @@ class SelectRectangle extends JLabel {
                     rechtsX = Math.min(rechtsX, maxX);
                     int onderY = Math.max(losY, drukY);
                     onderY = Math.min(onderY, maxY);
-                    
+
                     int widthX = rechtsX - linksX;
                     int widthY = onderY - bovenY;
 
-                    ImageIO.write(source.getSubimage(linksX, bovenY, widthX, widthY), erinExtension, new File(inputFile.getCanonicalPath() + idx++ + "." + erinExtension));
-
+                    ImageIO.write(source.getSubimage(linksX, bovenY, widthX, widthY), erinExtension, maakSubFile(inputFile));
+//                    ImageIO.write(source.getSubimage(linksX, bovenY, widthX, widthY), erinExtension, new File(inputFile.getCanonicalPath() + idx++ + "." + erinExtension));
                 } catch (IOException ex) {
                     Logger.getLogger(SelectRectangle.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
             }
-
         }
 
         void updateSize(MouseEvent e) {
@@ -121,7 +116,29 @@ class SelectRectangle extends JLabel {
             Rectangle totalRepaint = rectDraw.union(prevRectDrawn);
 //            System.out.println("SelectRectangle.MListener.updateSize()" + x + " "+ y);
             repaint(totalRepaint.x, totalRepaint.y, totalRepaint.width, totalRepaint.height);
+        }
 
+        File maakSubFile(File bronFile) {
+            File eruit;
+            int fileNummer = 1;
+            File workDir = bronFile.getParentFile();
+            int extensionIndex = bronFile.getName().lastIndexOf(".");
+            String voorvoegsel = bronFile.getName().substring(0, extensionIndex);
+
+            String extension = bronFile.getName().substring(extensionIndex);
+            do {
+                eruit = new File(workDir, voorvoegsel + fileNummer + "." + bronFile.getName().substring(extensionIndex));
+                fileNummer++;
+            } while (eruit.exists());
+
+            return eruit;
+
+        }
+
+        private int getGeschaaled(int werkInt) {
+            double x = werkInt / GdImageParting.schaal;
+            werkInt = (int) Math.round(x);
+            return (werkInt);
         }
     }
 
@@ -132,7 +149,7 @@ class SelectRectangle extends JLabel {
         if (curRect != null) {
             grapgic.setXORMode(Color.white);
             grapgic.drawRect(rectDraw.x, rectDraw.y, rectDraw.width - 1, rectDraw.height - 1);
-            drag.updateLabel(rectDraw);
+//            drag.updateLabel(rectDraw);
         }
     }
 
