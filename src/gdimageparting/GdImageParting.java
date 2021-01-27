@@ -26,7 +26,6 @@ public class GdImageParting {
     static int imageHoogte;
 
     private void createUi(Container cnt, ImageIcon backgr) {
-//        cnt.setLayout(new BoxLayout(cnt, BoxLayout.PAGE_AXIS));
         SelectRectangle area = new SelectRectangle(backgr, this);
         cnt.add(area);
     }
@@ -36,37 +35,33 @@ public class GdImageParting {
         Image imageToBeDisplayed = ImageIO.read(imageFile);
         int heightImageToBeDisplayed = imageToBeDisplayed.getHeight(null);
         Image imageVooricon = imageToBeDisplayed.getScaledInstance(-1, frameHoogte, Image.SCALE_FAST);
-//        return new ImageIcon(path);
         imageHoogte = imageVooricon.getHeight(frame);
         schaal = frameHoogte / (double) heightImageToBeDisplayed;
-
         return new ImageIcon(imageVooricon);
     }
 
-    private static void createGUI() throws IOException {
+    private static void createGUI(String parameterFile) throws IOException {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] schermen = ge.getScreenDevices();
         GraphicsDevice mijnScherm = schermen[0];
-
+        starFile = parameterFile;
         JFrame.setDefaultLookAndFeelDecorated(true);
         frame = new JFrame("ImageParting");
-//                    if (args[0] == null){
-        JFileChooser fc = new JFileChooser();
-        int returnVal = fc.showOpenDialog(frame);
+        if (parameterFile == "leeg") {
+            JFileChooser fc = new JFileChooser();
+            int returnVal = fc.showOpenDialog(frame);
 
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
-
-//                    starFile = args[0];
-//                    starFile = args[0];
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                starFile = file.getCanonicalPath();
+            }
+        } else {
+            starFile = parameterFile;
         }
-
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         int frameHoogte = mijnScherm.getDisplayMode().getHeight();
         frameHoogte = frameHoogte - 100;
-
         GdImageParting controller = new GdImageParting();
-
         controller.createUi(frame.getContentPane(), createBachground(starFile, frameHoogte));
         frame.setSize(imageHoogte, frameHoogte);
         frame.pack();
@@ -75,12 +70,19 @@ public class GdImageParting {
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
             public void run() {
-                try {
-                    createGUI();
-                } catch (IOException ex) {
-                    Logger.getLogger(GdImageParting.class.getName()).log(Level.SEVERE, null, ex);
+                if (args.length <= 0) {
+                    try {
+                        createGUI("leeg");
+                    } catch (IOException ex) {
+                        Logger.getLogger(GdImageParting.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    try {
+                        createGUI(args[0]);
+                    } catch (IOException ex) {
+                        Logger.getLogger(GdImageParting.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         });

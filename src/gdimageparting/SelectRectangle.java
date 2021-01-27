@@ -73,7 +73,7 @@ class SelectRectangle extends JLabel {
             Object[] options = {"Yes, please", "toch maar niet"};
             int n = JOptionPane.showOptionDialog(GdImageParting.frame,
                     "Deze selected area gebruiken?",
-                    "Nieuw van selectie",
+                    "Uw geselecteerde selectie",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
                     null, //do not use a custom Icon
