@@ -6,6 +6,8 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -58,18 +60,46 @@ public class GdImageParting {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
                 starFile = file.getCanonicalPath();
+            } else {
+                frame.removeAll();
+                frame.pack();
+                System.exit(99);
+
             }
         } else {
             starFile = parameterFile;
         }
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         int frameHoogte = mijnScherm.getDisplayMode().getHeight();
+        int schermwijdte = mijnScherm.getDisplayMode().getWidth();
         frameHoogte = frameHoogte - 100;
         GdImageParting controller = new GdImageParting();
         controller.createUi(frame.getContentPane(), createBachground(starFile, frameHoogte));
         frame.setSize(imageHoogte, frameHoogte);
+        frame.setLocation(20, 0);
+        ToetsLuistenaar toetsl = new ToetsLuistenaar();
+        frame.addKeyListener(toetsl);
+
         frame.pack();
         frame.setVisible(true);
+    }
+
+    static private class ToetsLuistenaar extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            System.out.println("toets " + e.getKeyCode());
+            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                frame.removeAll();
+                frame.pack();
+
+                try {
+                    createGUI("leeg");
+                } catch (IOException ex) {
+                    Logger.getLogger(GdImageParting.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }
 
     public static void main(String[] args) {

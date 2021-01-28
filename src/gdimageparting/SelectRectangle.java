@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -35,8 +37,11 @@ class SelectRectangle extends JLabel {
         MListener mylistn = new MListener();
         addMouseListener(mylistn);
         addMouseMotionListener(mylistn);
+        
 
     }
+
+
 
     private class MListener extends MouseInputAdapter {
 
@@ -125,7 +130,7 @@ class SelectRectangle extends JLabel {
 
             String extension = bronFile.getName().substring(extensionIndex);
             do {
-                eruit = new File(workDir, voorvoegsel + fileNummer +  bronFile.getName().substring(extensionIndex));
+                eruit = new File(workDir, voorvoegsel + fileNummer + bronFile.getName().substring(extensionIndex));
                 fileNummer++;
             } while (eruit.exists());
 
