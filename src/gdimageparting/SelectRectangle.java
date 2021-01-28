@@ -43,7 +43,7 @@ class SelectRectangle extends JLabel {
         @Override
         public void mousePressed(MouseEvent event) {
             int x = event.getX();
-            drukX = getGeschaaled(  x);
+            drukX = getGeschaaled(x);
             int y = event.getY();
             drukY = getGeschaaled(y);
             System.out.println("SelectRectangle.MListener.mousePressed()" + x + " " + y);
@@ -65,8 +65,6 @@ class SelectRectangle extends JLabel {
             // schalen van deze coordinaten
             losX = getGeschaaled(losX);
             losY = getGeschaaled(losY);
-            
-            
 
             updateSize(e);
 //            System.out.println("SelectRectangle.MListener.mouseReleased()" + e.getX() + " " + e.getY());
@@ -127,7 +125,7 @@ class SelectRectangle extends JLabel {
 
             String extension = bronFile.getName().substring(extensionIndex);
             do {
-                eruit = new File(workDir, voorvoegsel + fileNummer + "." + bronFile.getName().substring(extensionIndex));
+                eruit = new File(workDir, voorvoegsel + fileNummer +  bronFile.getName().substring(extensionIndex));
                 fileNummer++;
             } while (eruit.exists());
 

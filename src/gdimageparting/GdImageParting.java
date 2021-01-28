@@ -16,6 +16,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class GdImageParting {
 
@@ -49,6 +50,9 @@ public class GdImageParting {
         frame = new JFrame("ImageParting");
         if (parameterFile == "leeg") {
             JFileChooser fc = new JFileChooser();
+//            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+//                    "JPG & GIF Images", "jpg", "gif", "png","jpeg", "tiff");
+//            fc.setFileFilter(filter);
             int returnVal = fc.showOpenDialog(frame);
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
