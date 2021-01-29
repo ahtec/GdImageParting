@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +28,19 @@ public class GdImageParting {
     static String starFile;
     static public double schaal;
     static int imageHoogte;
+    static File currentFile;
+    static File imageFile;
+    static File[] filesInDirectoryVanCurrentImage;
+    static int filePionterInCurrectDirectory;
+
+    private static File[] vulFilesInDirectoryVanCurrentImage() {
+        File[] eruit = null;
+        File directoryVanCurrentImage = currentFile.getParentFile();
+        eruit = directoryVanCurrentImage.listFiles(new MyFileExtensionFilter());
+        
+
+        return (eruit);
+    }
 
     private void createUi(Container cnt, ImageIcon backgr) {
         SelectRectangle area = new SelectRectangle(backgr, this);
@@ -34,7 +48,8 @@ public class GdImageParting {
     }
 
     protected static ImageIcon createBachground(String deImageFile, int frameHoogte) throws IOException {
-        File imageFile = new File(deImageFile);
+        imageFile = new File(deImageFile);
+
         Image imageToBeDisplayed = ImageIO.read(imageFile);
         int heightImageToBeDisplayed = imageToBeDisplayed.getHeight(null);
         Image imageVooricon = imageToBeDisplayed.getScaledInstance(-1, frameHoogte, Image.SCALE_FAST);
@@ -49,8 +64,8 @@ public class GdImageParting {
         GraphicsDevice mijnScherm = schermen[0];
         starFile = parameterFile;
         JFrame.setDefaultLookAndFeelDecorated(true);
-        frame = new JFrame("ImageParting");
-        if (parameterFile == "leeg") {
+        frame = new JFrame(starFile);
+        if (parameterFile.compareTo("leeg") == 0) {
             JFileChooser fc = new JFileChooser();
 //            FileNameExtensionFilter filter = new FileNameExtensionFilter(
 //                    "JPG & GIF Images", "jpg", "gif", "png","jpeg", "tiff");
@@ -69,6 +84,12 @@ public class GdImageParting {
         } else {
             starFile = parameterFile;
         }
+        //OP dit punt weet ik de imagefile en de image directory
+        currentFile = new File(starFile);
+
+        filesInDirectoryVanCurrentImage = vulFilesInDirectoryVanCurrentImage();
+        filePionterInCurrectDirectory = setFilePionterInCurrectDirectory();
+        frame.setTitle(starFile);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         int frameHoogte = mijnScherm.getDisplayMode().getHeight();
         int schermwijdte = mijnScherm.getDisplayMode().getWidth();
@@ -84,21 +105,75 @@ public class GdImageParting {
         frame.setVisible(true);
     }
 
+    public static String getExtension(String fileName) {
+        int index = fileName.lastIndexOf('.');
+        if (index == -1) {
+            return "";
+        } else {
+            index++;
+            return fileName.substring(index);
+        }
+    }
+
+    private static int setFilePionterInCurrectDirectory() throws IOException {
+        int i = 0;
+        for (File fileInDirectoryVanCurrentImage : filesInDirectoryVanCurrentImage) {
+            if (fileInDirectoryVanCurrentImage.isFile()) {
+                if (fileInDirectoryVanCurrentImage.equals(currentFile)) {
+                    System.out.println("gevonden :  " + fileInDirectoryVanCurrentImage.getCanonicalPath());
+                    break;
+                }
+            }
+            i++;
+        }
+
+        return (i);
+    }
+
     static private class ToetsLuistenaar extends KeyAdapter {
 
+//        static File[] filesInDirectoryVanCurrentImage;
         @Override
         public void keyPressed(KeyEvent e) {
             System.out.println("toets " + e.getKeyCode());
+
             if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                 frame.removeAll();
                 frame.pack();
-
                 try {
                     createGUI("leeg");
                 } catch (IOException ex) {
                     Logger.getLogger(GdImageParting.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                filePionterInCurrectDirectory++;
+                if (filePionterInCurrectDirectory >= filesInDirectoryVanCurrentImage.length) {
+                    filePionterInCurrectDirectory = 0;
+                }
+                frame.removeAll();
+                frame.pack();
+                try {
+                    createGUI(filesInDirectoryVanCurrentImage[filePionterInCurrectDirectory].getCanonicalPath());
+                } catch (IOException ex) {
+                    Logger.getLogger(GdImageParting.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                filePionterInCurrectDirectory--;
+                if (filePionterInCurrectDirectory <  0) {
+                    filePionterInCurrectDirectory = filesInDirectoryVanCurrentImage.length;
+                    filePionterInCurrectDirectory--;
+                }
+                frame.removeAll();
+                frame.pack();
+                try {
+                    createGUI(filesInDirectoryVanCurrentImage[filePionterInCurrectDirectory].getCanonicalPath());
+                } catch (IOException ex) {
+                    Logger.getLogger(GdImageParting.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
         }
     }
 
@@ -120,5 +195,24 @@ public class GdImageParting {
                 }
             }
         });
+    }
+
+    public static class MyFileExtensionFilter implements FilenameFilter {
+
+        private String extension;
+
+//		public MyFileNameFilter() {
+////			this.extension = extension.toLowerCase();
+//		}
+        @Override
+        public boolean accept(File dir, String name) {
+            boolean eruit;
+            eruit = Boolean.FALSE;
+            if ((name.toLowerCase().endsWith("jpeg")) || (name.toLowerCase().endsWith("jpg"))) {
+                eruit = Boolean.TRUE;
+            }
+            return (eruit);
+        }
+
     }
 }

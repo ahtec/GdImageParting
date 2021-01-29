@@ -37,11 +37,8 @@ class SelectRectangle extends JLabel {
         MListener mylistn = new MListener();
         addMouseListener(mylistn);
         addMouseMotionListener(mylistn);
-        
 
     }
-
-
 
     private class MListener extends MouseInputAdapter {
 
