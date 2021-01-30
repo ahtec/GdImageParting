@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -20,6 +21,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.filechooser.FileNameExtensionFilter;
+//import org.apache.commons.io.comparator.NameFileComparator;
 
 public class GdImageParting {
 
@@ -27,7 +29,8 @@ public class GdImageParting {
     JLabel label;
     static String starFile;
     static public double schaal;
-    static int imageHoogte;
+    static int imageHoogte, imageBreedte;
+
     static File currentFile;
     static File imageFile;
     static File[] filesInDirectoryVanCurrentImage;
@@ -37,25 +40,44 @@ public class GdImageParting {
         File[] eruit = null;
         File directoryVanCurrentImage = currentFile.getParentFile();
         eruit = directoryVanCurrentImage.listFiles(new MyFileExtensionFilter());
-        
+//        Arrays.sort(eruit);
 
         return (eruit);
+    }
+
+    protected static ImageIcon createBachground(String deImageFile, int schermHoogte, int schermBreedte) throws IOException {
+        double quotientSchermWH, quotientImageWH;
+        Image imageVooricon;
+        imageFile = new File(deImageFile);
+
+        Image imageToBeDisplayed = ImageIO.read(imageFile);
+        int heightImageToBeDisplayed = imageToBeDisplayed.getHeight(null);
+        int widthImageToBeDisplayed = imageToBeDisplayed.getWidth(null);
+
+        quotientSchermWH = schermBreedte / schermHoogte;
+        quotientImageWH = widthImageToBeDisplayed / heightImageToBeDisplayed  ;
+        if (quotientSchermWH > quotientImageWH) {
+            // schalen op hoogte
+            System.out.println("schalen op hoogte");
+            imageVooricon = imageToBeDisplayed.getScaledInstance(-1, schermHoogte, Image.SCALE_FAST);
+            imageHoogte = imageVooricon.getHeight(frame);
+            imageBreedte = imageVooricon.getWidth(frame);
+            schaal = schermHoogte / (double) heightImageToBeDisplayed;
+
+        } else {
+            // schalen op breedte
+            System.out.println("schalen op breedte");
+            imageVooricon = imageToBeDisplayed.getScaledInstance(schermBreedte, -1, Image.SCALE_FAST);
+            imageHoogte = imageVooricon.getHeight(frame);
+            imageBreedte = imageVooricon.getWidth(frame);
+            schaal = schermBreedte / (double) widthImageToBeDisplayed;
+        }
+        return new ImageIcon(imageVooricon);
     }
 
     private void createUi(Container cnt, ImageIcon backgr) {
         SelectRectangle area = new SelectRectangle(backgr, this);
         cnt.add(area);
-    }
-
-    protected static ImageIcon createBachground(String deImageFile, int frameHoogte) throws IOException {
-        imageFile = new File(deImageFile);
-
-        Image imageToBeDisplayed = ImageIO.read(imageFile);
-        int heightImageToBeDisplayed = imageToBeDisplayed.getHeight(null);
-        Image imageVooricon = imageToBeDisplayed.getScaledInstance(-1, frameHoogte, Image.SCALE_FAST);
-        imageHoogte = imageVooricon.getHeight(frame);
-        schaal = frameHoogte / (double) heightImageToBeDisplayed;
-        return new ImageIcon(imageVooricon);
     }
 
     private static void createGUI(String parameterFile) throws IOException {
@@ -94,9 +116,10 @@ public class GdImageParting {
         int frameHoogte = mijnScherm.getDisplayMode().getHeight();
         int schermwijdte = mijnScherm.getDisplayMode().getWidth();
         frameHoogte = frameHoogte - 100;
+        schermwijdte = schermwijdte - 100;
         GdImageParting controller = new GdImageParting();
-        controller.createUi(frame.getContentPane(), createBachground(starFile, frameHoogte));
-        frame.setSize(imageHoogte, frameHoogte);
+        controller.createUi(frame.getContentPane(), createBachground(starFile, frameHoogte, schermwijdte));
+        frame.setSize(imageBreedte, imageHoogte);
         frame.setLocation(20, 0);
         ToetsLuistenaar toetsl = new ToetsLuistenaar();
         frame.addKeyListener(toetsl);
@@ -161,7 +184,7 @@ public class GdImageParting {
             }
             if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                 filePionterInCurrectDirectory--;
-                if (filePionterInCurrectDirectory <  0) {
+                if (filePionterInCurrectDirectory < 0) {
                     filePionterInCurrectDirectory = filesInDirectoryVanCurrentImage.length;
                     filePionterInCurrectDirectory--;
                 }
