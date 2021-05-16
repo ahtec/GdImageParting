@@ -37,10 +37,11 @@ public class GdImageParting {
     static File[] filesInDirectoryVanCurrentImage;
     static int filePionterInCurrectDirectory;
 
-    private static File[] vulFilesInDirectoryVanCurrentImage() {
-        File[] eruit = null;
+    private static File[] vulFilesInDirectoryVanCurrentImage() throws IOException {
+                    System.out.println("Vullen files array " + currentFile.getCanonicalPath());
+
         File directoryVanCurrentImage = currentFile.getParentFile();
-        eruit = directoryVanCurrentImage.listFiles(new MyFileExtensionFilter());
+        File[] eruit = directoryVanCurrentImage.listFiles(new MyFileExtensionFilter());
 //        Arrays.sort(eruit);
 
         return (eruit);
@@ -54,6 +55,7 @@ public class GdImageParting {
         Image imageToBeDisplayed = ImageIO.read(imageFile);
         int heightImageToBeDisplayed = imageToBeDisplayed.getHeight(null);
         int widthImageToBeDisplayed = imageToBeDisplayed.getWidth(null);
+
         System.out.println("Image breedte "+ widthImageToBeDisplayed);
         System.out.println("Image hoogte "+heightImageToBeDisplayed);
 
@@ -62,6 +64,9 @@ public class GdImageParting {
         System.out.println("quaScherWH"+ quotientSchermWH);
         System.out.println("quaImageWH"+ quotientImageWH);
         
+
+        quotientSchermWH = schermBreedte / (double) schermHoogte;
+        quotientImageWH = widthImageToBeDisplayed / (double) heightImageToBeDisplayed;
         if (quotientSchermWH > quotientImageWH) {
             // schalen op hoogte
             System.out.println("schalen op hoogte");
@@ -114,8 +119,10 @@ public class GdImageParting {
         }
         //OP dit punt weet ik de imagefile en de image directory
         currentFile = new File(starFile);
-
-        filesInDirectoryVanCurrentImage = vulFilesInDirectoryVanCurrentImage();
+//        String vorigeDir = filesInDirectoryVanCurrentImage[0].getParentFile().getCanonicalPath();
+//        if (parameterFile.compareToIgnoreCase(vorigeDir) == 0) {
+            filesInDirectoryVanCurrentImage = vulFilesInDirectoryVanCurrentImage();
+//        }
         filePionterInCurrectDirectory = setFilePionterInCurrectDirectory();
         frame.setTitle(starFile + " "+ versie);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -127,6 +134,7 @@ public class GdImageParting {
         System.out.println("schermwijdte "+ schermwijdte);
         GdImageParting controller = new GdImageParting();
         controller.createUi(frame.getContentPane(), createBachground(starFile, frameHoogte, schermwijdte));
+//controler.SelectRectangle area = new SelectRectangle(createBachground(starFile, frameHoogte, schermwijdte), this);
         frame.setSize(imageBreedte, imageHoogte);
         frame.setLocation(20, 0);
         ToetsLuistenaar toetsl = new ToetsLuistenaar();
@@ -135,7 +143,56 @@ public class GdImageParting {
         frame.pack();
         frame.setVisible(true);
     }
+ private static void  createGUINext(String parameterFile) throws IOException {
+           GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] schermen = ge.getScreenDevices();
+        GraphicsDevice mijnScherm = schermen[0];
+        starFile = parameterFile;
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        frame.setTitle(starFile);
+//        frame = new JFrame(starFile);
+        if (parameterFile.compareTo("leeg") == 0) {
+            JFileChooser fc = new JFileChooser();
+//            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+//                    "JPG & GIF Images", "jpg", "gif", "png","jpeg", "tiff");
+//            fc.setFileFilter(filter);
+            int returnVal = fc.showOpenDialog(frame);
 
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                starFile = file.getCanonicalPath();
+            } else {
+                frame.removeAll();
+                frame.pack();
+                System.exit(0);
+
+            }
+        } else {
+            starFile = parameterFile;
+        }
+        //OP dit punt weet ik de imagefile en de image directory
+        currentFile = new File(starFile);
+//        String vorigeDir = filesInDirectoryVanCurrentImage[0].getParentFile().getCanonicalPath();
+//        if (parameterFile.compareToIgnoreCase(vorigeDir) == 0) {
+//            filesInDirectoryVanCurrentImage = vulFilesInDirectoryVanCurrentImage();
+//        }
+//        filePionterInCurrectDirectory = setFilePionterInCurrectDirectory();
+        frame.setTitle(starFile);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        int frameHoogte = mijnScherm.getDisplayMode().getHeight();
+        int schermwijdte = mijnScherm.getDisplayMode().getWidth();
+        frameHoogte = frameHoogte - 100;
+        schermwijdte = schermwijdte - 100;
+        GdImageParting controller = new GdImageParting();
+        controller.createUi(frame.getContentPane(), createBachground(starFile, frameHoogte, schermwijdte));
+        frame.setSize(imageBreedte, imageHoogte);
+        frame.setLocation(20, 0);
+        ToetsLuistenaar toetsl = new ToetsLuistenaar();
+        frame.addKeyListener(toetsl);
+
+        frame.pack();
+        frame.setVisible(true);  
+ }
     public static String getExtension(String fileName) {
         int index = fileName.lastIndexOf('.');
         if (index == -1) {
@@ -161,6 +218,20 @@ public class GdImageParting {
         return (i);
     }
 
+//    static void showNext(File erin) throws IOException {
+//        frame.removeAll();
+////        frame.pack();
+//        frame.setTitle(erin.getCanonicalPath());
+//        controller.createUi(frame.getContentPane(), createBachground());
+//        frame.setSize(imageBreedte, imageHoogte);
+//        frame.setLocation(20, 0);
+////        ToetsLuistenaar toetsl = new ToetsLuistenaar();
+////        frame.addKeyListener(toetsl);
+//        frame.pack();
+//        frame.setVisible(true);
+//
+//    }
+//
     static private class ToetsLuistenaar extends KeyAdapter {
 
 //        static File[] filesInDirectoryVanCurrentImage;
@@ -177,15 +248,16 @@ public class GdImageParting {
                     Logger.getLogger(GdImageParting.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+
             if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                 filePionterInCurrectDirectory++;
                 if (filePionterInCurrectDirectory >= filesInDirectoryVanCurrentImage.length) {
                     filePionterInCurrectDirectory = 0;
                 }
                 frame.removeAll();
-                frame.pack();
+//                frame.pack();
                 try {
-                    createGUI(filesInDirectoryVanCurrentImage[filePionterInCurrectDirectory].getCanonicalPath());
+                    createGUINext(filesInDirectoryVanCurrentImage[filePionterInCurrectDirectory].getCanonicalPath());
                 } catch (IOException ex) {
                     Logger.getLogger(GdImageParting.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -199,16 +271,18 @@ public class GdImageParting {
                 frame.removeAll();
                 frame.pack();
                 try {
-                    createGUI(filesInDirectoryVanCurrentImage[filePionterInCurrectDirectory].getCanonicalPath());
+                    createGUINext(filesInDirectoryVanCurrentImage[filePionterInCurrectDirectory].getCanonicalPath());
                 } catch (IOException ex) {
                     Logger.getLogger(GdImageParting.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
         }
-    }
 
+    }
+ 
     public static void main(String[] args) {
+//        init();
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (args.length <= 0) {

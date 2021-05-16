@@ -82,9 +82,9 @@ class SelectRectangle extends JLabel {
             if (n == 0) {
                 try {
                     // make  deel image
-                    File inputFile = new File(GdImageParting.starFile);
-                    String erinExtension = getExtension(inputFile.getName());
-                    final BufferedImage source = ImageIO.read(inputFile);
+//                    File inputFile = new File(GdImageParting.starFile);
+                    String erinExtension = getExtension(GdImageParting.currentFile.getName());
+                    final BufferedImage source = ImageIO.read(GdImageParting.currentFile);
                     System.out.println("SelectRectangle.MListener.mouseReleased()" + drukX + " " + drukY + " " + losX + " " + losY);
                     int maxX = source.getWidth();
                     int maxY = source.getHeight();
@@ -99,8 +99,9 @@ class SelectRectangle extends JLabel {
 
                     int widthX = rechtsX - linksX;
                     int widthY = onderY - bovenY;
-
-                    ImageIO.write(source.getSubimage(linksX, bovenY, widthX, widthY), erinExtension, maakSubFile(inputFile));
+                    if (widthX > 0 & widthY > 0) {
+                        ImageIO.write(source.getSubimage(linksX, bovenY, widthX, widthY), erinExtension, maakSubFile(GdImageParting.currentFile));
+                    }  else {System.out.println(" Geen image gemaakt omdat coor 0 zijn");}
 //                    ImageIO.write(source.getSubimage(linksX, bovenY, widthX, widthY), erinExtension, new File(inputFile.getCanonicalPath() + idx++ + "." + erinExtension));
                 } catch (IOException ex) {
                     Logger.getLogger(SelectRectangle.class.getName()).log(Level.SEVERE, null, ex);
