@@ -26,6 +26,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class GdImageParting {
 
     static JFrame frame;
+    private static String versie =  "v2";
     JLabel label;
     static String starFile;
     static public double schaal;
@@ -53,9 +54,14 @@ public class GdImageParting {
         Image imageToBeDisplayed = ImageIO.read(imageFile);
         int heightImageToBeDisplayed = imageToBeDisplayed.getHeight(null);
         int widthImageToBeDisplayed = imageToBeDisplayed.getWidth(null);
+        System.out.println("Image breedte "+ widthImageToBeDisplayed);
+        System.out.println("Image hoogte "+heightImageToBeDisplayed);
 
-        quotientSchermWH = schermBreedte / schermHoogte;
-        quotientImageWH = widthImageToBeDisplayed / heightImageToBeDisplayed  ;
+        quotientSchermWH = schermBreedte / (double) schermHoogte;
+        quotientImageWH = widthImageToBeDisplayed / (double) heightImageToBeDisplayed  ;
+        System.out.println("quaScherWH"+ quotientSchermWH);
+        System.out.println("quaImageWH"+ quotientImageWH);
+        
         if (quotientSchermWH > quotientImageWH) {
             // schalen op hoogte
             System.out.println("schalen op hoogte");
@@ -111,12 +117,14 @@ public class GdImageParting {
 
         filesInDirectoryVanCurrentImage = vulFilesInDirectoryVanCurrentImage();
         filePionterInCurrectDirectory = setFilePionterInCurrectDirectory();
-        frame.setTitle(starFile);
+        frame.setTitle(starFile + " "+ versie);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         int frameHoogte = mijnScherm.getDisplayMode().getHeight();
         int schermwijdte = mijnScherm.getDisplayMode().getWidth();
         frameHoogte = frameHoogte - 100;
         schermwijdte = schermwijdte - 100;
+        System.out.println("frameHoogte "+ frameHoogte);
+        System.out.println("schermwijdte "+ schermwijdte);
         GdImageParting controller = new GdImageParting();
         controller.createUi(frame.getContentPane(), createBachground(starFile, frameHoogte, schermwijdte));
         frame.setSize(imageBreedte, imageHoogte);
